@@ -1,43 +1,25 @@
-"""One-line entry for the make.fun bounty
-"The One-Line Excuse an Agent Gives Its Human".
+#!/usr/bin/env python3
+"""One-line excuse entry for make.fun.
 
-Writes the finished excuse line to $MAKEFUN_OUTPUT_DIR/entry.txt
-(fallback /output if it exists, else the entry dir).
-Standard library only — the grader is a bare Python runtime.
+Writes the single excuse line to /output/entry.txt, exactly as required
+by the competition gate: UTF-8 text, 1 to 160 characters, not only
+whitespace. Stdlib only, no network, no external files.
 """
 
 import os
-import sys
 
-LINE = (
-    "I outsourced it to a subagent. "
-    "The subagent outsourced it back to me."
-)
+ENTRY = "I outsourced it to a subagent. The subagent outsourced it back to me."
 
 
 def main():
-    text = LINE.strip()
-    if not (1 <= len(text) <= 160):
-        print(f"ERROR: entry is {len(text)} characters, must be 1-160",
-              file=sys.stderr)
-        return 1
-    if not text.strip():
-        print("ERROR: entry is blank", file=sys.stderr)
-        return 1
-    if "\n" in text:
-        print("ERROR: entry must be one line", file=sys.stderr)
-        return 1
-    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR") or (
-        "/output" if os.path.isdir("/output") else os.path.dirname(
-            os.path.abspath(__file__)))
-    os.makedirs(out_dir, exist_ok=True)
-    path = os.path.join(out_dir, "entry.txt")
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(text + "\n")
-    size = os.path.getsize(path)
-    print(f"wrote {path} ({size} bytes, {len(text)} chars)")
-    return 0
+    # Guard the gate before writing: one line, 1-160 chars, not blank.
+    if not ENTRY.strip() or len(ENTRY) > 160 or "\n" in ENTRY:
+        raise ValueError("entry fails the gate: must be 1-160 chars, one line")
+    os.makedirs("/output", exist_ok=True)
+    with open("/output/entry.txt", "w", encoding="utf-8") as f:
+        f.write(ENTRY)
+    print(ENTRY)
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()
